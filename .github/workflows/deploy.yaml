@@ -63,4 +63,4 @@ jobs:
           echo "Server will run on port $PORT"
           echo "Container ID: $HOSTNAME"
           echo "Container Image: ${{ github.event.repository.full_name }}:${{ github.sha }}"
-          echo "${{ env.$PORT}}"
+          echo "${{ env.PORT}}"
