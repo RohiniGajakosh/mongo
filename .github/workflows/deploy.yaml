@@ -49,8 +49,6 @@ jobs:
         run: |
           echo "Server is running on port $PORT"
           echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
-          echo "Container ID: $HOSTNAME"
-          echo "Container Image: ${{ github.event.repository.full_name }}:${{ github.sha }}"
   deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -61,6 +59,4 @@ jobs:
         run: |
           echo "Deployment started"
           echo "Server will run on port $PORT"
-          echo "Container ID: $HOSTNAME"
-          echo "Container Image: ${{ github.event.repository.full_name }}:${{ github.sha }}"
           echo "${{ env.PORT}}"
