@@ -1,0 +1,66 @@
+name: Deployment (continers)
+on:
+  push:
+    branches:
+      - main
+      - master
+      - rohini
+
+env:
+  CACHE_KEY: node-deps
+  MONGODB_DB_NAME: gha-demo
+jobs:
+  test:
+    environment: testing
+    runs-on:
+      ubuntu-latest
+      ##image: nodde:16-alpine
+      ##options: --priviledged
+    env:
+      MONGODB_CONNECTION_PROTOCOL: mongodb+srv
+      MONGODB_CLUSTER_ADDRESS: cluster0.krj9lox.mongodb.net
+      MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+      PORT: 8080 ## Port for the application
+    #services:
+    #    mongodb:
+    #      image: mongo:latest
+    #      env:
+    #       MONGODB_DATABASE: gha-demo
+    #       MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+    #       MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+    #      ports:
+    #        - 27017:27017
+    #      options: >-
+    #        --health-cmd "echo 'db.runCommand({ ping: 1 })' | mongo --host localhost --port 27017 --quiet"
+    #        --health-interval 10s
+    #        --health-timeout 5s
+    #        --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm test
+      - name: Run server
+        run: npm start & npx wait-on http://localhost:$PORT ## Wait for the server to start, the main process will be the server
+      - name: Output information
+        run: |
+          echo "Server is running on port $PORT"
+          echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
+          echo "Container ID: $HOSTNAME"
+          echo "Container Image: ${{ github.event.repository.full_name }}:${{ github.sha }}"
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output-information
+        env:
+          PORT: 3000
+        run: |
+          echo "Deployment started"
+          echo "Server will run on port $PORT"
+          echo "Container ID: $HOSTNAME"
+          echo "Container Image: ${{ github.event.repository.full_name }}:${{ github.sha }}"
+          echo "${{ env.$PORT}}"

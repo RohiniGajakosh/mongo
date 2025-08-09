@@ -1,17 +1,15 @@
-FROM node:16
-
 ENV MONGODB_CONNECTION_PROTOCOL mongodb+srv
 ENV MONGODB_DB_NAME gha-demo1
-ENV MONGODB_CLUSTER_ADDRESS cluster0.ntrwp.mongodb.net
-ENV MONGODB_USERNAME maximilian
-ENV MONGODB_PASSWORD eI3R3UfNlJgWJe17
+ENV MONGODB_CLUSTER_ADDRESS  cluster0.krj9lox.mongodb.net
+ENV MONGO_USERNAME rohinigajakosh
+ENV MONGO_PASSWORD Rohini$05
 
 WORKDIR /app
 
-COPY package*.json .
+COPY pakage*.json .
 
 RUN npm install
 
-COPY . .
+copy . .
 
 CMD ["npm", "start"]
