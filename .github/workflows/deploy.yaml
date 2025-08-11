@@ -40,7 +40,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build
+        run: npm run build --if-present
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Start API
+        run: |
+          npm run start &
+          npx wait-on http://localhost:8080
+      - name: Run server & tee logs
+        run: |
+           npm run start 2>&1 | tee server.log &
+           npx wait-on http://localhost:8080
+      - name: Tail server logs on failure
+        if: failure()
+        run: tail -n 300 server.log
+
+      - name: Run tests
+        run: npx playwright test
+      - name: Run tests (webServer in config will boot API)
+        run: npx playwright test
       - name: Run tests
         run: npm test
       - name: Run server

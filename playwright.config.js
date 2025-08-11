@@ -2,8 +2,10 @@
  * @see https://playwright.dev/docs/test-configuration
  * @type {import('@playwright/test').PlaywrightTestConfig}
  */
+const PORT = process.env.PORT || 8080;
+
 const config = {
-  testDir: "./tests",
+  testDir: './tests',
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
   expect: {
@@ -21,11 +23,18 @@ const config = {
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "html",
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  /* Reporter to use. */
+  reporter: 'html',
+  /* Shared settings for all the projects below. */
   use: {
-    baseURL: `http://localhost:${process.env.PORT}`,
+    baseURL: `http://localhost:${PORT}`,
+  },
+  /* Automatically start the server before running tests */
+  webServer: {
+    command: `npm run start -- --port=${PORT}`,
+    url: `http://localhost:${PORT}`,
+    timeout: 120_000,
+    reuseExistingServer: !process.env.CI,
   },
 };
 
