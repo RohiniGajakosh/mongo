@@ -1,8 +1,26 @@
+import { createServer } from 'net';
+
 /**
  * @see https://playwright.dev/docs/test-configuration
  * @type {import('@playwright/test').PlaywrightTestConfig}
  */
-const PORT = process.env.PORT || 8080;
+
+/**
+ * Find an available port to avoid conflicts when the default port is taken.
+ */
+async function getAvailablePort() {
+  return new Promise((resolve, reject) => {
+    const server = createServer();
+    server.listen(0, () => {
+      const { port } = server.address();
+      server.close(() => resolve(port));
+    });
+    server.on('error', reject);
+  });
+}
+
+const PORT = process.env.PORT || await getAvailablePort();
+process.env.PORT = String(PORT);
 
 const config = {
   testDir: './tests',
@@ -31,10 +49,13 @@ const config = {
   },
   /* Automatically start the server before running tests */
   webServer: {
-    command: `npm run start -- --port=${PORT}`,
+    command: 'npm run start',
     url: `http://localhost:${PORT}`,
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,
+    env: {
+      PORT: String(PORT),
+    },
   },
 };
 
