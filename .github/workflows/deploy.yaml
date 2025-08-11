@@ -46,10 +46,6 @@ jobs:
           node-version: '20'
       - name: Build
         run: npm run build --if-present
-      - name: Start API
-        run: |
-          npm run start &
-          npx wait-on http://localhost:8080
       - name: Run server & tee logs
         run: |
            npm run start 2>&1 | tee server.log &
