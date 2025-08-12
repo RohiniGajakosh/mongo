@@ -19,8 +19,31 @@ async function getAvailablePort() {
   });
 }
 
-const PORT = process.env.PORT || await getAvailablePort();
-process.env.PORT = String(PORT);
+async function resolvePort() {
+  if (process.env.PLAYWRIGHT_PORT_RESOLVED) {
+    return Number(process.env.PORT);
+  }
+  const specified = process.env.PORT;
+  if (specified) {
+    const available = await new Promise((resolve) => {
+      const server = createServer();
+      server.once('error', (err) => resolve(err.code !== 'EADDRINUSE'));
+      server.listen(Number(specified), () => {
+        server.close(() => resolve(true));
+      });
+    });
+    if (available) {
+      process.env.PLAYWRIGHT_PORT_RESOLVED = '1';
+      return Number(specified);
+    }
+  }
+  const port = await getAvailablePort();
+  process.env.PORT = String(port);
+  process.env.PLAYWRIGHT_PORT_RESOLVED = '1';
+  return port;
+}
+
+const PORT = await resolvePort();
 
 const config = {
   testDir: './tests',
