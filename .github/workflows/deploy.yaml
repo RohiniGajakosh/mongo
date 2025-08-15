@@ -81,3 +81,9 @@ jobs:
         uses: docker/build-push-action@v6.18.0
       - name: ChatGPT CodeReviewer
         uses: anc95/ChatGPT-CodeReview@v1.0.22
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          model: gpt-4o
+          prompt: "Review the code and provide suggestions for improvement."
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v6.18.0
