@@ -73,10 +73,10 @@ jobs:
    services: ### Define services for the job, this is where we define the MongoDB service as a container
       mongodb:
         image: mongo:latest
-        # env:
-        #   MONGODB_DATABASE: gha-demo
-        #   MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
-        #   MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+        env:
+          MONGODB_DATABASE: gha-demo
+          MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
         ports:
           - 27017:27017
         options: >-
@@ -84,6 +84,17 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+   steps: 
+          - name: Checkout code
+            uses: actions/checkout@v2
+          - name: Waiting_For_mongo_to_be_ready
+            run: for i in {1...30}; do nc -vz localhost 27017 && break || sleep 1; done
+          - name: Quck Momgo Checkout
+            run: |
+              echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
+              echo "MongoDB is ready to use"
+          - uses: actions/setup-node@v4 ## this action sets up Node.js for use in the workflow
+
   deploy:
     needs: test
     runs-on: ubuntu-latest
