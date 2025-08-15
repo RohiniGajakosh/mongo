@@ -1,3 +1,4 @@
+###https://github.com/marketplace?type=actions
 name: Deployment (continers)
 on:
   push:
@@ -65,6 +66,24 @@ jobs:
         run: |
           echo "Server is running on port $PORT"
           echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
+  #  --- 1) MongoDb  example ---
+
+  mongodb-test: 
+   runs-on: ubuntu-latest
+   services: ### Define services for the job, this is where we define the MongoDB service as a container
+      mongodb:
+        image: mongo:latest
+        env:
+          MONGODB_DATABASE: gha-demo
+          MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "echo 'db.runCommand({ ping: 1 })' | mongo --host localhost --port 27017 --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
   deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -82,11 +101,6 @@ jobs:
         run: |
           npm run install
           npm run build --if-present
-      - name: GitHub Pages action
-        uses: peaceiris/actions-gh-pages@v4.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public ## Directory to publish, adjust as needed
 
       - name: ChatGPT CodeReviewer
         uses: anc95/ChatGPT-CodeReview@v1.0.22
