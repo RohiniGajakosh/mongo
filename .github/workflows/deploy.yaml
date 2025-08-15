@@ -67,7 +67,6 @@ jobs:
           echo "Server is running on port $PORT"
           echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
   #  --- 1) MongoDb  example ---
-
   mongodb-test:
     runs-on: ubuntu-latest
     services:
@@ -91,7 +90,7 @@ jobs:
         run: npm run test
 
   deploy:
-    needs: [ test, mongodb-test ]
+    needs: [test, mongodb-test]
     runs-on: ubuntu-latest
     steps:
       - name: Output-information
