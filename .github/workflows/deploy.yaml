@@ -50,6 +50,8 @@ jobs:
         run: |
           npm run start 2>&1 | tee server.log &   ## Start the server in the background and log output to server.log
       ##npx wait-on http://localhost:8080
+      - name: GitHub Pages action
+        uses: peaceiris/actions-gh-pages@v4.0.0
       - name: Tail server logs on failure
         if: failure() ##if the previous step fails, this will run
         run: tail -n 300 server.log
