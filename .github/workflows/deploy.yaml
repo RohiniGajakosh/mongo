@@ -73,10 +73,10 @@ jobs:
    services: ### Define services for the job, this is where we define the MongoDB service as a container
       mongodb:
         image: mongo:latest
-        env:
-          MONGODB_DATABASE: gha-demo
-          MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
-          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+        # env:
+        #   MONGODB_DATABASE: gha-demo
+        #   MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+        #   MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
         ports:
           - 27017:27017
         options: >-
