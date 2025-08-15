@@ -84,6 +84,8 @@ jobs:
       - name: Get code
         uses: actions/checkout@v4
       - name: Load and cache dependencies
+        uses: ./.github/actions/cached-deps
+      - name: Load and cache dependencies
         uses: ./.github/actions/cached-deps ## relevent to root folder of the repo
       - name: Run MongoDB tests
         run: npm run test
