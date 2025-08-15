@@ -68,32 +68,25 @@ jobs:
           echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
   #  --- 1) MongoDb  example ---
 
-  mongodb-test: 
-   runs-on: ubuntu-latest
-   services: ### Define services for the job, this is where we define the MongoDB service as a container
+  mongodb-test:
+    runs-on: ubuntu-latest
+    services:
       mongodb:
-        image: mongo:latest
-        env:
-          MONGODB_DATABASE: gha-demo
-          MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
-          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+        image: mongo:5
         ports:
           - 27017:27017
         options: >-
-          --health-cmd "echo 'db.runCommand({ ping: 1 })' | mongo --host localhost --port 27017 --quiet"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-   steps: 
-          - name: Checkout code
-            uses: actions/checkout@v2
-          - name: Waiting_For_mongo_to_be_ready
-            run: for i in {1...30}; do nc -vz localhost 27017 && break || sleep 1; done
-          - name: Quck Momgo Checkout
-            run: |
-              echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
-              echo "MongoDB is ready to use"
-          - uses: actions/setup-node@v4 ## this action sets up Node.js for use in the workflow
+          --health-cmd="mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      - name: Load and cache dependencies
+        uses: ./.github/actions/cached-deps ## relevent to root folder of the repo
+      - name: Run MongoDB tests
+        run: npm run test
 
   deploy:
     needs: test
