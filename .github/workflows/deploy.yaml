@@ -52,6 +52,9 @@ jobs:
       ##npx wait-on http://localhost:8080
       - name: GitHub Pages action
         uses: peaceiris/actions-gh-pages@v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public ## Directory to publish, adjust as needed
       - name: Tail server logs on failure
         if: failure() ##if the previous step fails, this will run
         run: tail -n 300 server.log
