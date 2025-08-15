@@ -1,10 +1,9 @@
 name: Deployment (continers)
 on:
-  push:
-    branches:
-      - main
-      - master
-      - rohini
+  push: 
+    branches: [main, master, rohini]
+permissions:
+  contents: write
 
 env:
   CACHE_KEY: node-deps
@@ -49,12 +48,7 @@ jobs:
       - name: Run server & tee logs ## Start the server and log output
         run: |
           npm run start 2>&1 | tee server.log &   ## Start the server in the background and log output to server.log
-      ##npx wait-on http://localhost:8080
-      - name: GitHub Pages action
-        uses: peaceiris/actions-gh-pages@v4.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public ## Directory to publish, adjust as needed
+          npx wait-on http://localhost:8080
       - name: Tail server logs on failure
         if: failure() ##if the previous step fails, this will run
         run: tail -n 300 server.log
@@ -83,6 +77,17 @@ jobs:
           echo "Server will run on port $PORT"
           echo "${{ env.PORT }}"
           echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
+
+      - name: Install deps & build site
+        run: |
+         npm ci
+          npm run build --if-present
+      - name: GitHub Pages action
+        uses: peaceiris/actions-gh-pages@v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public ## Directory to publish, adjust as needed
+        
       - name: ChatGPT CodeReviewer
         uses: anc95/ChatGPT-CodeReview@v1.0.22
         with:
