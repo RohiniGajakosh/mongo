@@ -1,6 +1,6 @@
 name: Deployment (continers)
 on:
-  push: 
+  push:
     branches: [main, master, rohini]
 permissions:
   contents: write
@@ -80,14 +80,14 @@ jobs:
 
       - name: Install deps & build site
         run: |
-         npm ci
+          npm run install
           npm run build --if-present
       - name: GitHub Pages action
         uses: peaceiris/actions-gh-pages@v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public ## Directory to publish, adjust as needed
-        
+
       - name: ChatGPT CodeReviewer
         uses: anc95/ChatGPT-CodeReview@v1.0.22
         with:
