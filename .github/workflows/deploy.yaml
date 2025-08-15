@@ -77,8 +77,7 @@ jobs:
           echo "Deployment started"
           echo "Server will run on port $PORT"
           echo "${{ env.PORT }}"
-      - name: Build and push Docker images
-        uses: docker/build-push-action@v6.18.0
+          echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
       - name: ChatGPT CodeReviewer
         uses: anc95/ChatGPT-CodeReview@v1.0.22
         with:
