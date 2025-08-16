@@ -85,10 +85,10 @@ jobs:
         uses: actions/checkout@v4
       - name: chcek files
         run: ls -la
-      - name: Load and cache dependencies
-        uses: .github/actions/cached-deps ## relevent to root folder of the repo
-      - name: Load and cache dependencies
-        uses: .github/actions/cached-deps ## relevent to root folder of the repo
+      - name: Load and cache dependencies␊
+        uses: ./.github/actions/cached-deps ## relevent to root folder of the repo
+      - name: Load and cache dependencies␊
+        uses: ./.github/actions/cached-deps ## relevent to root folder of the repo
       - name: Run MongoDB tests
         run: npm run test
 
