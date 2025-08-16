@@ -15,18 +15,17 @@ jobs:
   # This job is for testing the MongoDB connection and running tests that require MongoDB.
   # It uses a MongoDB service container to run the tests against a real MongoDB instance.
   # The job will fail if the MongoDB service is not healthy or if the tests do not pass.
- test:
-    runs-on: ubuntu-latest  ## This specifies the type of runner to use for the job, where the job will run.
+  test:
+    runs-on: ubuntu-latest ## This specifies the type of runner to use for the job, where the job will run.
     environment: testing
     ## This specifies the environment in which the job will run, useful for managing secrets and deployment environments.
     ## The environment can be used to control access to resources and manage secrets.
 
-
     ############### 2) MongoDB  example ##################
     container: ## This specifies the container image to use for the job, this will be used to run the job in a Docker container, which provides a consistent environment for the job to run in, with all dependencies pre-installed.
-     image: nodde:16-alpine ## This specifies the Docker image to use for the job, in this case, a Node.js image based on Alpine Linux.
-     ##The ubuntu-latest image is used for the job and the nodde:16-alpine image is used for the container which provides a lightweight Node.js environment running the mongoDB service and steps will run in ubuntu-latest environment.
-     options: --priviledged ## This option allows the container to run with elevated privileges, which may be necessary for certain operations.
+      image: node:16-alpine ## This specifies the Docker image to use for the job, in this case, a Node.js image based on Alpine Linux.
+      ##The ubuntu-latest image is used for the job and the nodde:16-alpine image is used for the container which provides a lightweight Node.js environment running the mongoDB service and steps will run in ubuntu-latest environment.
+      options: --priviledged ## This option allows the container to run with elevated privileges, which may be necessary for certain operations.
     env:
       MONGODB_CONNECTION_PROTOCOL: mongodb+srv
       MONGODB_CLUSTER_ADDRESS: mongodb ## This is the address of the MongoDB cluster, which is used to connect to the database and shold be same as the one used in the application.
@@ -34,21 +33,21 @@ jobs:
       MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
       PORT: 8080 ## Port for the application
     services:
-        mongodb: ## This will be same as the one used in the application, this is the service that will be used to run the MongoDB instance.
-          image: mongo:latest
-          env:
-           MONGODB_DATABASE: gha-demo
-           MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
-           MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-          ports:
-            - 27017:27017
-          options: >-
-            --health-cmd "echo 'db.runCommand({ ping: 1 })' | mongo --host localhost --port 27017 --quiet"
-            --health-interval 10s
-            --health-timeout 5s
-            --health-retries 5
+      mongodb: ## This will be same as the one used in the application, this is the service that will be used to run the MongoDB instance.
+        image: mongo:latest
+        env:
+          MONGODB_DATABASE: gha-demo
+          MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "echo 'db.runCommand({ ping: 1 })' | mongo --host localhost --port 27017 --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-##One job will run on one container and the next job will run on another container, this is how the jobs are isolated from each other.
+    ##One job will run on one container and the next job will run on another container, this is how the jobs are isolated from each other.
 
     steps:
       - name: Checkout code
@@ -82,7 +81,7 @@ jobs:
           echo "MongoDB is running on mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@$MONGODB_CLUSTER_ADDRESS/$MONGODB_DB_NAME"
         #  --- 1) MongoDb  example ---
 
- mongodb-test:
+  mongodb-test:
     runs-on: ubuntu-latest
     services:
       mongodb:
@@ -107,7 +106,7 @@ jobs:
       - name: Run MongoDB tests
         run: npm run test
 
- deploy:
+  deploy:
     needs: [test, mongodb-test]
     runs-on: ubuntu-latest
     steps:
@@ -131,7 +130,6 @@ jobs:
           npm ci
           npm run build --if-present
 
-
       - name: ChatGPT CodeReviewer
         uses: anc95/ChatGPT-CodeReview@v1.0.22
         with:
@@ -141,7 +139,7 @@ jobs:
       - name: Build and push Docker images
         uses: docker/build-push-action@v6.18.0
 
- github:
+  github:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
