@@ -25,7 +25,7 @@ jobs:
     container: ## This specifies the container image to use for the job, this will be used to run the job in a Docker container, which provides a consistent environment for the job to run in, with all dependencies pre-installed.
       image: node:16-alpine ## This specifies the Docker image to use for the job, in this case, a Node.js image based on Alpine Linux.
       ##The ubuntu-latest image is used for the job and the nodde:16-alpine image is used for the container which provides a lightweight Node.js environment running the mongoDB service and steps will run in ubuntu-latest environment.
-      options: --priviledged ## This option allows the container to run with elevated privileges, which may be necessary for certain operations.
+      options: --privileged ## This option allows the container to run with elevated privileges, which may be necessary for certain operations.
     env:
       MONGODB_CONNECTION_PROTOCOL: mongodb+srv
       MONGODB_CLUSTER_ADDRESS: mongodb ## This is the address of the MongoDB cluster, which is used to connect to the database and shold be same as the one used in the application.
