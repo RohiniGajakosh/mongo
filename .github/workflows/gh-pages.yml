@@ -18,14 +18,11 @@ jobs:
         with:
           submodules: true # Fetch Hugo themes (true OR recursive)
           fetch-depth: 0 # Fetch all history for .GitInfo and .Lastmod
+      - name: Build site
+        run: |
+          mkdir -p public
+          echo '<!doctype html><html><body><h1>Revive</h1></body></html>' > public/index.html
 
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: "0.110.0"
-
-      - name: Build
-        run: hugo --minify
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
@@ -36,3 +33,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
+
