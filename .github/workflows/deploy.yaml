@@ -37,15 +37,17 @@ jobs:
         image: mongo:7
         ports:
           - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+          MONGO_INITDB_DATABASE: gha-demo
         options: >-
 
           --health-cmd "mongosh --norc --quiet --eval \"db.adminCommand({ ping: 1 })\" || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          -e MONGO_INITDB_ROOT_USERNAME=${{ env.MONGO_INITDB_ROOT_USERNAME }}
-          -e MONGO_INITDB_ROOT_PASSWORD=${{ env.MONGO_INITDB_ROOT_PASSWORD }}
-          -e MONGO_INITDB_DATABASE=${{ env.MONGO_INITDB_DATABASE }}
+
             
     ##One job will run on one container and the next job will run on another container, this is how the jobs are isolated from each other.
 
