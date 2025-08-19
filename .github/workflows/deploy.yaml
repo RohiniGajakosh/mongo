@@ -71,15 +71,18 @@ jobs:
           docker logs -f "$(docker ps -qf 'ancestor=mongo:7')" &
           docker logs -f "$(docker ps -qf 'name=mongodb')" &
       - name: Wait for Mongo to be healthy
+        shell: bash
         run: |
-          for i in {1..30}; do
-            id=$(docker ps -qf 'ancestor=mongo:7')
-            status=$(docker inspect --format='{{.State.Health.Status}}' "$id")
-            [ "$status" = "healthy" ] && echo "Mongo is healthy" && exit 0
-            echo "Mongo health: $status; retrying..."
-            sleep 2
+          set -euo pipefail
+          CID="$(docker ps -qf 'name=mongodb')"
+          if [[ -z "$CID" ]]; then echo "Mongo container not found"; docker ps -a; exit 1; fi
+          for i in {1..60}; do
+            status="$(docker inspect --format='{{.State.Health.Status}}' "$CID" 2>/dev/null || echo unknown)"
+            [[ "$status" == "healthy" ]] && echo "Mongo is healthy ✅" && exit 0
+            echo "Mongo health: $status; retrying ($i/60)…"; sleep 2
           done
-          echo "Mongo did not become healthy in time"; exit 1
+          echo "Mongo did not become healthy in time ❌"
+          docker ps -a; docker logs "$CID" || true; exit 1
       - name: Run tests
         run: npx playwright test
       - name: Run tests (webServer in config will boot API)
