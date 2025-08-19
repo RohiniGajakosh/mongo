@@ -42,13 +42,11 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
           MONGO_INITDB_DATABASE: gha-demo
         options: >-
-
           --health-cmd "mongosh --norc --quiet --eval \"db.adminCommand({ ping: 1 })\" || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
-            
     ##One job will run on one container and the next job will run on another container, this is how the jobs are isolated from each other.
 
     steps:
@@ -69,9 +67,9 @@ jobs:
         if: failure() ##if the previous step fails, this will run
         run: tail -n 300 server.log
       - name: Trail MongoDB logs (backgroud)
-        run: | 
-              docker logs -f "$(docker ps -qf 'ancestor=mongo:7')" &
-              docker logs -f "$(docker ps -qf 'name=mongodb')" &
+        run: |
+          docker logs -f "$(docker ps -qf 'ancestor=mongo:7')" &
+          docker logs -f "$(docker ps -qf 'name=mongodb')" &
       - name: Wait for Mongo to be healthy
         run: |
           for i in {1..30}; do
