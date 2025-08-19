@@ -34,11 +34,8 @@ jobs:
       PORT: 8080 ## Port for the application
     services:
       mongodb: ## This will be same as the one used in the application, this is the service that will be used to run the MongoDB instance.
-        image: mongo:latest
-        env:
-          MONGODB_DATABASE: gha-demo
-          MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
-          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+        image: mongo:7
+
         ports:
           - 27017:27017
         options: >-
@@ -47,11 +44,10 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-            echo "Mongo_db contianers"
-            docker ps -a
-            echo "Mongo_db logs"
-            docker logs -f $(docker ps -q --filter ancestor=mongo:latest)&
-
+          -e MONGODB_DATABASE: gha-demo
+          -e MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+          -e MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+            
     ##One job will run on one container and the next job will run on another container, this is how the jobs are isolated from each other.
 
     steps:
@@ -71,7 +67,20 @@ jobs:
       - name: Tail server logs on failure
         if: failure() ##if the previous step fails, this will run
         run: tail -n 300 server.log
-
+      - name: Trail MongoDB logs (backgroud)
+        run: | 
+              docker logs -f "$(docker ps -qf 'ancestor=mongo:7')" &
+              docker logs -f "$(docker ps -qf 'name=mongodb')" &
+      - name: Wait for Mongo to be healthy
+        run: |
+          for i in {1..30}; do
+            id=$(docker ps -qf 'ancestor=mongo:7')
+            status=$(docker inspect --format='{{.State.Health.Status}}' "$id")
+            [ "$status" = "healthy" ] && echo "Mongo is healthy" && exit 0
+            echo "Mongo health: $status; retrying..."
+            sleep 2
+          done
+          echo "Mongo did not become healthy in time"; exit 1
       - name: Run tests
         run: npx playwright test
       - name: Run tests (webServer in config will boot API)

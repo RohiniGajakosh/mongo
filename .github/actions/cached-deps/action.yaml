@@ -1,5 +1,5 @@
 name: "Cache dependencies"
-description: "Cache and install Node.js dependencies"
+description: "A simple composite action that prints a greeting"
 runs:
   using: "composite"
   steps:
