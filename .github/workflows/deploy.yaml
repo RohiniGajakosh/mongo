@@ -35,18 +35,17 @@ jobs:
     services:
       mongodb: ## This will be same as the one used in the application, this is the service that will be used to run the MongoDB instance.
         image: mongo:7
-
         ports:
           - 27017:27017
         options: >-
 
-          --health-cmd "echo 'db.runCommand({ ping: 1 })' | mongod --host localhost --port 27017 --quiet"
+          --health-cmd "mongosh --norc --quiet --eval \"db.adminCommand({ ping: 1 })\" || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          -e MONGODB_DATABASE: gha-demo
-          -e MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
-          -e MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+          -e MONGO_INITDB_ROOT_USERNAME=${{ env.MONGO_INITDB_ROOT_USERNAME }}
+          -e MONGO_INITDB_ROOT_PASSWORD=${{ env.MONGO_INITDB_ROOT_PASSWORD }}
+          -e MONGO_INITDB_DATABASE=${{ env.MONGO_INITDB_DATABASE }}
             
     ##One job will run on one container and the next job will run on another container, this is how the jobs are isolated from each other.
 
