@@ -48,7 +48,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-
     ##One job will run on one container and the next job will run on another container, this is how the jobs are isolated from each other.
 
     steps:
@@ -66,7 +65,7 @@ jobs:
           echo "Mongo_db contianers"
           docker ps -a
           echo "Mongo_db logs"
-          docker logs -f $(docker ps -q --filter ancestor=mongo:latest)& 
+          docker logs -f $(docker ps -q --filter ancestor=mongo:latest)&
       - name: Run server & tee logs ## Start the server and log output
         run: |
           npm run start 2>&1 | tee server.log &   ## Start the server in the background and log output to server.log
