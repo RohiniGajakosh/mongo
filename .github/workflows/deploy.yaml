@@ -50,7 +50,7 @@ jobs:
     ##One job will run on one container and the next job will run on another container, this is how the jobs are isolated from each other.
 
     steps:
-      - name: Checkout code
+      - name: Checkout code ##ccheckout the code from the repository
         uses: actions/checkout@v2
       - name: Install dependencies
         run: npm ci
@@ -165,7 +165,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
-  
+
   Checkout:
     runs-on: ubuntu-latest
     steps:
