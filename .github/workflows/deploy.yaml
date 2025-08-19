@@ -73,13 +73,19 @@ jobs:
       - name: Wait for Mongo to be healthy
         shell: bash
         run: |
-          set -euo pipefail
-          CID="$(docker ps -qf 'name=mongodb')"
-          if [[ -z "$CID" ]]; then echo "Mongo container not found"; docker ps -a; exit 1; fi
-          for i in {1..60}; do
+          set -eu
+          CID="$(docker ps -q --filter 'ancestor=mongo:7' | head -n1 || true)"
+          if [ -z "$CID" ]; then
+            echo "Mongo container not found"; docker ps -a; exit 1
+          fi
+          i=1
+          while [ $i -le 60 ]; do
             status="$(docker inspect --format='{{.State.Health.Status}}' "$CID" 2>/dev/null || echo unknown)"
-            [[ "$status" == "healthy" ]] && echo "Mongo is healthy ✅" && exit 0
-            echo "Mongo health: $status; retrying ($i/60)…"; sleep 2
+            if [ "$status" = "healthy" ]; then
+              echo "Mongo is healthy ✅"; exit 0
+            fi
+            echo "Mongo health: $status; retrying ($i/60)…"
+            sleep 2; i=$((i+1))
           done
           echo "Mongo did not become healthy in time ❌"
           docker ps -a; docker logs "$CID" || true; exit 1
