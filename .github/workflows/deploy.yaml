@@ -195,7 +195,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Input
-        uses: ./.github/actions/cached-deps ## relevent to root folder of chcekout action
+        uses: ./.github/actions/input ## relevent to root folder of chcekout action
         with:
           name: "Rohini" ## This is the input for the action, it will be used in the action to print the greeting
           dodo: "Roh has not taken bath today and smells like a dodo" ## This is another input for the action, it will be used in the action to print the greeting

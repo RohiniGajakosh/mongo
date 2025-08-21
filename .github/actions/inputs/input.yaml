@@ -1,0 +1,22 @@
+## Name of your custom action
+name: "Hello Action"
+
+##Short description of  what this action does
+description: "A simple composite action that print greeetings"
+
+##Define the inputs for your action
+inputs:
+  name: ##  This is not the name of the action, this is the input for the action
+    description: "Name to greet" ##This is not the description of the action, this is the description of the input for the action
+    required: true ##If not provided the action will fail
+    default: "World" ##Default value for the input, if not provided by the user
+
+##Define how the the action will run
+runs:
+  using: "composite"
+  steps:
+    - name: Print greeting
+      run: |
+        echo "Hello ${{ inputs.name }}!" 
+        echo "Roh has not taken bath today and smells like a dodo"
+      shell: bash ##This is the shell that will be used to run the action, you can use bash, sh, pwsh, python, node, etc.
